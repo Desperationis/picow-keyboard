@@ -19,7 +19,8 @@ This was designed to be quick and easy to use, though there is a teensy bit of a
 
 
 ## Usage
-Network SSID: picow-keyboard
-Network Pass: picow-keyboard
+Network SSID: `picow-keyboard`
+
+Network Pass: `picow-keyboard`
 
 Navigate to http://[RASPBERRY PI IP HERE]/ (IP varies, but it usually is 192.168.4.1)
