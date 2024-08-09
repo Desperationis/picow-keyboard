@@ -49,9 +49,11 @@ FORM_HTML_TEMPLATE = """
 </head>
 <body>
     <h1>Web interface for pico-keyboard</h1>
-    <form action="/" method="post" enctype="application/x-www-form-urlencoded">
+    <form action="/" method="post" enctype="text/plain">
         <label for="keyboard_data">Enter your text:</label><br>
-        <textarea input="keyboard_data" name="data" rows="10" cols="50"></textarea><br><br>
+        <input type="text" name="data" placeholder="Type something..."><br>
+        <label for="press_enter">Press ENTER?</label>
+        <input type="checkbox" id="press_enter" name="press_enter"><br>
 
         <label for="special_1">Special Key 1 (Overrides text)</label>
         <select id="special_1" name="special_1">
@@ -124,18 +126,26 @@ def form(request: Request):
     """
     Serve a form with the given enctype, and display back the submitted value.
     """
-    enctype = "application/x-www-form-urlencoded"
+    enctype = "text/plain"
 
     if request.method == POST:
         text_sent = request.form_data["data"]
         key1 = request.form_data["special_1"]
         key2 = request.form_data["special_2"]
         shortcut_char = request.form_data["shortcut_char"]
+        enter = "press_enter" in request.form_data
 
         print(request.form_data)
         if key1 == "none" and key2 == "none":
             data = request.form_data.get("data")
-            print(f"I would have written {data}")
+
+            print("Decoded:")
+            print(data)
+
+            if enter:
+                data += "\n"
+
+            layout.write(data)
 
         else:
             # Shortcut mode
