@@ -24,3 +24,13 @@ Network SSID: `picow-keyboard`
 Network Pass: `picow-keyboard`
 
 Navigate to http://[RASPBERRY PI IP HERE]/ (IP varies, but it usually is 192.168.4.1)
+
+
+## Useful Debugging Commands
+If you want to look at the console output, run this command:
+
+```
+sudo minicom -D /dev/ttyACM0
+```
+
+It shows you the output of the script, as well as allow you to reload the script.
