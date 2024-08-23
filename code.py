@@ -37,7 +37,8 @@ key_translate = {
     "f10": Keycode.F10,
     "f11": Keycode.F11,
     "f12": Keycode.F12,
-    "windows": Keycode.WINDOWS
+    "windows": Keycode.WINDOWS,
+    "tab": Keycode.TAB
 }
 
 FORM_HTML_TEMPLATE = """
@@ -81,6 +82,7 @@ FORM_HTML_TEMPLATE = """
             <option value="f11">F11</option>
             <option value="f12">F12</option>
             <option value="windows">WINDOWS</option>
+            <option value="tab">TAB</option>
         </select>
 
         <br>
@@ -110,6 +112,7 @@ FORM_HTML_TEMPLATE = """
             <option value="f11">F11</option>
             <option value="f12">F12</option>
             <option value="windows">WINDOWS</option>
+            <option value="tab">TAB</option>
         </select>
         <br>
         <label for="shortcut_char">Char to use shortcut with: (lowercase)</label>
