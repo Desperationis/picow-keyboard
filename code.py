@@ -38,7 +38,16 @@ key_translate = {
     "f11": Keycode.F11,
     "f12": Keycode.F12,
     "windows": Keycode.WINDOWS,
-    "tab": Keycode.TAB
+    "tab": Keycode.TAB,
+    "down_arrow": Keycode.DOWN_ARROW,
+    "up_arrow": Keycode.UP_ARROW,
+    "left_arrow": Keycode.LEFT_ARROW,
+    "right_arrow": Keycode.RIGHT_ARROW,
+    "quote": Keycode.QUOTE,
+    "mac_command": Keycode.COMMAND,
+    "forward_slash": Keycode.FORWARD_SLASH,
+    "grave_accent": Keycode.GRAVE_ACCENT,
+    "backslash": Keycode.BACKSLASH,
 }
 
 FORM_HTML_TEMPLATE = """
@@ -83,6 +92,15 @@ FORM_HTML_TEMPLATE = """
             <option value="f12">F12</option>
             <option value="windows">WINDOWS</option>
             <option value="tab">TAB</option>
+            <option value="up_arrow">UP_ARROW</option>
+            <option value="down_arrow">DOWN_ARROW</option>
+            <option value="left_arrow">LEFT_ARROW</option>
+            <option value="right_arrow">RIGHT_ARROW</option>
+            <option value="quote">QUOTE</option>
+            <option value="mac_command">MAC_COMMAND</option>
+            <option value="forward_slash">FORWARD SLASH</option>
+            <option value="grave_accent">GRAVE ACCENT</option>
+            <option value="backslash">BACKSLASH</option>
         </select>
 
         <br>
@@ -113,6 +131,15 @@ FORM_HTML_TEMPLATE = """
             <option value="f12">F12</option>
             <option value="windows">WINDOWS</option>
             <option value="tab">TAB</option>
+            <option value="up_arrow">UP_ARROW</option>
+            <option value="down_arrow">DOWN_ARROW</option>
+            <option value="left_arrow">LEFT_ARROW</option>
+            <option value="right_arrow">RIGHT_ARROW</option>
+            <option value="quote">QUOTE</option>
+            <option value="mac_command">MAC_COMMAND</option>
+            <option value="forward_slash">FORWARD SLASH</option>
+            <option value="grave_accent">GRAVE ACCENT</option>
+            <option value="backslash">BACKSLASH</option>
         </select>
         <br>
         <label for="shortcut_char">Char to use shortcut with: (lowercase)</label>
