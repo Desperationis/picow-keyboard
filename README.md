@@ -1,5 +1,5 @@
 ## picow-keyboard
-Turn your Raspberry Pi Pico W in a portable keyboard! Simply plug it into any system, connect to the AP it starts, and use this HTML interface:
+Turn your Raspberry Pi Pico W in a portable keyboard! Simply plug it into any system, connect to the AP it starts, and use this HTML interface to type out to the system as if the pico was a keyboard:
 
 ![pico-keyboard preview](.github/picokeyboard.png)
 
