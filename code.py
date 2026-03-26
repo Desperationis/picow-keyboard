@@ -6,6 +6,7 @@ from adafruit_httpserver import Server, Request, Response, GET, POST
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+import json
 
 kbd = Keyboard(usb_hid.devices)
 layout = KeyboardLayoutUS(kbd)
@@ -22,12 +23,31 @@ key_translate = {
     "escape": Keycode.ESCAPE,
     "backspace": Keycode.BACKSPACE,
     "delete": Keycode.DELETE,
+    "tab": Keycode.TAB,
+    "space": Keycode.SPACEBAR,
+    "caps_lock": Keycode.CAPS_LOCK,
     "l_shift": Keycode.LEFT_SHIFT,
     "l_control": Keycode.LEFT_CONTROL,
     "l_alt": Keycode.LEFT_ALT,
-    "l_shift": Keycode.RIGHT_SHIFT,
-    "l_control": Keycode.RIGHT_CONTROL,
-    "l_alt": Keycode.RIGHT_ALT,
+    "r_shift": Keycode.RIGHT_SHIFT,
+    "r_control": Keycode.RIGHT_CONTROL,
+    "r_alt": Keycode.RIGHT_ALT,
+    "windows": Keycode.WINDOWS,
+    "mac_command": Keycode.COMMAND,
+    "insert": Keycode.INSERT,
+    "home": Keycode.HOME,
+    "end": Keycode.END,
+    "page_up": Keycode.PAGE_UP,
+    "page_down": Keycode.PAGE_DOWN,
+    "up_arrow": Keycode.UP_ARROW,
+    "down_arrow": Keycode.DOWN_ARROW,
+    "left_arrow": Keycode.LEFT_ARROW,
+    "right_arrow": Keycode.RIGHT_ARROW,
+    "print_screen": Keycode.PRINT_SCREEN,
+    "scroll_lock": Keycode.SCROLL_LOCK,
+    "num_lock": Keycode.KEYPAD_NUMLOCK,
+    "pause": Keycode.PAUSE,
+    "application": Keycode.APPLICATION,
     "f1": Keycode.F1,
     "f2": Keycode.F2,
     "f3": Keycode.F3,
@@ -40,14 +60,19 @@ key_translate = {
     "f10": Keycode.F10,
     "f11": Keycode.F11,
     "f12": Keycode.F12,
-    "windows": Keycode.WINDOWS,
-    "tab": Keycode.TAB,
-    "down_arrow": Keycode.DOWN_ARROW,
-    "up_arrow": Keycode.UP_ARROW,
-    "left_arrow": Keycode.LEFT_ARROW,
-    "right_arrow": Keycode.RIGHT_ARROW,
+    "f13": Keycode.F13,
+    "f14": Keycode.F14,
+    "f15": Keycode.F15,
+    "f16": Keycode.F16,
+    "f17": Keycode.F17,
+    "f18": Keycode.F18,
+    "f19": Keycode.F19,
+    "f20": Keycode.F20,
+    "f21": Keycode.F21,
+    "f22": Keycode.F22,
+    "f23": Keycode.F23,
+    "f24": Keycode.F24,
     "quote": Keycode.QUOTE,
-    "mac_command": Keycode.COMMAND,
     "forward_slash": Keycode.FORWARD_SLASH,
     "grave_accent": Keycode.GRAVE_ACCENT,
     "backslash": Keycode.BACKSLASH,
@@ -224,7 +249,7 @@ FORM_HTML_TEMPLATE = """
             <h1>Web interface for pico-keyboard</h1>
             <p class="description">Send text or special keys to your Pico-based keyboard.</p>
 
-            <form action="/" method="post" enctype="text/plain">
+            <form id="kbd_form" action="/" method="post">
                 <div class="form-grid">
                     <div>
                         <label for="keyboard_data">Enter your text</label>
@@ -246,15 +271,34 @@ FORM_HTML_TEMPLATE = """
                                 <select id="special_1" name="special_1">
                                     <option value="none">N/A</option>
                                     <option value="enter">ENTER</option>
-                                    <option value="escape">ESC</option>
+                                    <option value="tab">TAB</option>
+                                    <option value="space">SPACE</option>
                                     <option value="backspace">BACKSPACE</option>
                                     <option value="delete">DEL</option>
+                                    <option value="escape">ESC</option>
+                                    <option value="caps_lock">CAPS LOCK</option>
                                     <option value="l_shift">LSHIFT</option>
                                     <option value="l_control">LCTRL</option>
                                     <option value="l_alt">LALT</option>
                                     <option value="r_shift">RSHIFT</option>
-                                    <option value="r_control">RCONTROL</option>
+                                    <option value="r_control">RCTRL</option>
                                     <option value="r_alt">RALT</option>
+                                    <option value="windows">WINDOWS</option>
+                                    <option value="mac_command">MAC COMMAND</option>
+                                    <option value="up_arrow">UP</option>
+                                    <option value="down_arrow">DOWN</option>
+                                    <option value="left_arrow">LEFT</option>
+                                    <option value="right_arrow">RIGHT</option>
+                                    <option value="home">HOME</option>
+                                    <option value="end">END</option>
+                                    <option value="page_up">PAGE UP</option>
+                                    <option value="page_down">PAGE DOWN</option>
+                                    <option value="insert">INSERT</option>
+                                    <option value="print_screen">PRINT SCREEN</option>
+                                    <option value="scroll_lock">SCROLL LOCK</option>
+                                    <option value="num_lock">NUM LOCK</option>
+                                    <option value="pause">PAUSE</option>
+                                    <option value="application">MENU</option>
                                     <option value="f1">F1</option>
                                     <option value="f2">F2</option>
                                     <option value="f3">F3</option>
@@ -267,14 +311,19 @@ FORM_HTML_TEMPLATE = """
                                     <option value="f10">F10</option>
                                     <option value="f11">F11</option>
                                     <option value="f12">F12</option>
-                                    <option value="windows">WINDOWS</option>
-                                    <option value="tab">TAB</option>
-                                    <option value="up_arrow">UP_ARROW</option>
-                                    <option value="down_arrow">DOWN_ARROW</option>
-                                    <option value="left_arrow">LEFT_ARROW</option>
-                                    <option value="right_arrow">RIGHT_ARROW</option>
+                                    <option value="f13">F13</option>
+                                    <option value="f14">F14</option>
+                                    <option value="f15">F15</option>
+                                    <option value="f16">F16</option>
+                                    <option value="f17">F17</option>
+                                    <option value="f18">F18</option>
+                                    <option value="f19">F19</option>
+                                    <option value="f20">F20</option>
+                                    <option value="f21">F21</option>
+                                    <option value="f22">F22</option>
+                                    <option value="f23">F23</option>
+                                    <option value="f24">F24</option>
                                     <option value="quote">QUOTE</option>
-                                    <option value="mac_command">MAC_COMMAND</option>
                                     <option value="forward_slash">FORWARD SLASH</option>
                                     <option value="grave_accent">GRAVE ACCENT</option>
                                     <option value="backslash">BACKSLASH</option>
@@ -285,15 +334,34 @@ FORM_HTML_TEMPLATE = """
                                 <select id="special_2" name="special_2">
                                     <option value="none">N/A</option>
                                     <option value="enter">ENTER</option>
-                                    <option value="escape">ESC</option>
+                                    <option value="tab">TAB</option>
+                                    <option value="space">SPACE</option>
                                     <option value="backspace">BACKSPACE</option>
                                     <option value="delete">DEL</option>
+                                    <option value="escape">ESC</option>
+                                    <option value="caps_lock">CAPS LOCK</option>
                                     <option value="l_shift">LSHIFT</option>
                                     <option value="l_control">LCTRL</option>
                                     <option value="l_alt">LALT</option>
                                     <option value="r_shift">RSHIFT</option>
-                                    <option value="r_control">RCONTROL</option>
+                                    <option value="r_control">RCTRL</option>
                                     <option value="r_alt">RALT</option>
+                                    <option value="windows">WINDOWS</option>
+                                    <option value="mac_command">MAC COMMAND</option>
+                                    <option value="up_arrow">UP</option>
+                                    <option value="down_arrow">DOWN</option>
+                                    <option value="left_arrow">LEFT</option>
+                                    <option value="right_arrow">RIGHT</option>
+                                    <option value="home">HOME</option>
+                                    <option value="end">END</option>
+                                    <option value="page_up">PAGE UP</option>
+                                    <option value="page_down">PAGE DOWN</option>
+                                    <option value="insert">INSERT</option>
+                                    <option value="print_screen">PRINT SCREEN</option>
+                                    <option value="scroll_lock">SCROLL LOCK</option>
+                                    <option value="num_lock">NUM LOCK</option>
+                                    <option value="pause">PAUSE</option>
+                                    <option value="application">MENU</option>
                                     <option value="f1">F1</option>
                                     <option value="f2">F2</option>
                                     <option value="f3">F3</option>
@@ -306,14 +374,19 @@ FORM_HTML_TEMPLATE = """
                                     <option value="f10">F10</option>
                                     <option value="f11">F11</option>
                                     <option value="f12">F12</option>
-                                    <option value="windows">WINDOWS</option>
-                                    <option value="tab">TAB</option>
-                                    <option value="up_arrow">UP_ARROW</option>
-                                    <option value="down_arrow">DOWN_ARROW</option>
-                                    <option value="left_arrow">LEFT_ARROW</option>
-                                    <option value="right_arrow">RIGHT_ARROW</option>
+                                    <option value="f13">F13</option>
+                                    <option value="f14">F14</option>
+                                    <option value="f15">F15</option>
+                                    <option value="f16">F16</option>
+                                    <option value="f17">F17</option>
+                                    <option value="f18">F18</option>
+                                    <option value="f19">F19</option>
+                                    <option value="f20">F20</option>
+                                    <option value="f21">F21</option>
+                                    <option value="f22">F22</option>
+                                    <option value="f23">F23</option>
+                                    <option value="f24">F24</option>
                                     <option value="quote">QUOTE</option>
-                                    <option value="mac_command">MAC_COMMAND</option>
                                     <option value="forward_slash">FORWARD SLASH</option>
                                     <option value="grave_accent">GRAVE ACCENT</option>
                                     <option value="backslash">BACKSLASH</option>
@@ -338,6 +411,25 @@ FORM_HTML_TEMPLATE = """
             <div class="footer">Works offline and adapts to your system theme.</div>
         </div>
     </div>
+    <script>
+        document.getElementById('kbd_form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch('/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    data: document.getElementById('keyboard_data').value,
+                    press_enter: document.getElementById('press_enter').checked,
+                    special_1: document.getElementById('special_1').value,
+                    special_2: document.getElementById('special_2').value,
+                    shortcut_char: document.getElementById('shortcut_char').value
+                })
+            }).then(function() {
+                document.getElementById('keyboard_data').value = '';
+                document.getElementById('shortcut_char').value = '';
+            });
+        });
+    </script>
 </body>
 </html>
 """
@@ -350,16 +442,15 @@ def form(request: Request):
     enctype = "text/plain"
 
     if request.method == POST:
-        text_sent = request.form_data["data"]
-        key1 = request.form_data["special_1"]
-        key2 = request.form_data["special_2"]
-        shortcut_char = request.form_data["shortcut_char"]
-        enter = "press_enter" in request.form_data
+        body = json.loads(request.body)
+        data = body.get("data", "")
+        key1 = body.get("special_1", "none")
+        key2 = body.get("special_2", "none")
+        shortcut_char = body.get("shortcut_char", "")
+        enter = body.get("press_enter", False)
 
-        print(request.form_data)
+        print(body)
         if key1 == "none" and key2 == "none":
-            data = request.form_data.get("data")
-
             print("Decoded:")
             print(data)
 
@@ -381,9 +472,10 @@ def form(request: Request):
             if len(shortcut_char) > 0:
                 keycodes.extend(layout.keycodes(shortcut_char))
 
-
             print(f"Sending {keycodes}")
             kbd.send(*keycodes)
+
+        return Response(request, '{"ok":true}', content_type="application/json")
 
     return Response(
         request,
