@@ -249,7 +249,7 @@ FORM_HTML_TEMPLATE = """
             <h1>Web interface for pico-keyboard</h1>
             <p class="description">Send text or special keys to your Pico-based keyboard.</p>
 
-            <form id="kbd_form" action="/" method="post">
+            <form id="kbd_form">
                 <div class="form-grid">
                     <div>
                         <label for="keyboard_data">Enter your text</label>
@@ -404,6 +404,7 @@ FORM_HTML_TEMPLATE = """
 
                     <div>
                         <button type="submit">Send</button>
+                        <p id="send_status" class="help" style="margin-top:8px"></p>
                     </div>
                 </div>
             </form>
@@ -412,37 +413,105 @@ FORM_HTML_TEMPLATE = """
         </div>
     </div>
     <script>
-        document.getElementById('kbd_form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        var sending = false;
+
+        function sendKeyboardData() {
+            if (sending) {
+                return;
+            }
+
+            var payload = {
+                data: document.getElementById('keyboard_data').value,
+                press_enter: document.getElementById('press_enter').checked,
+                special_1: document.getElementById('special_1').value,
+                special_2: document.getElementById('special_2').value,
+                shortcut_char: document.getElementById('shortcut_char').value
+            };
+
+            if (
+                !payload.data &&
+                payload.special_1 === 'none' &&
+                payload.special_2 === 'none' &&
+                !payload.shortcut_char
+            ) {
+                return;
+            }
+
+            sending = true;
+            var statusEl = document.getElementById('send_status');
+            if (statusEl) {
+                statusEl.textContent = 'Sending...';
+            }
+
             fetch('/', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    data: document.getElementById('keyboard_data').value,
-                    press_enter: document.getElementById('press_enter').checked,
-                    special_1: document.getElementById('special_1').value,
-                    special_2: document.getElementById('special_2').value,
-                    shortcut_char: document.getElementById('shortcut_char').value
-                })
-            }).then(function() {
-                document.getElementById('keyboard_data').value = '';
-                document.getElementById('shortcut_char').value = '';
+                body: JSON.stringify(payload)
+            }).then(function(response) {
+                sending = false;
+                if (response.ok) {
+                    document.getElementById('keyboard_data').value = '';
+                    document.getElementById('shortcut_char').value = '';
+                    if (statusEl) {
+                        statusEl.textContent = 'Sent.';
+                    }
+                } else if (statusEl) {
+                    statusEl.textContent = 'Send failed.';
+                }
+            }).catch(function() {
+                sending = false;
+                if (statusEl) {
+                    statusEl.textContent = 'Send failed.';
+                }
             });
+        }
+
+        document.getElementById('kbd_form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            sendKeyboardData();
         });
     </script>
 </body>
 </html>
 """
 
+
+def _parse_submission(request):
+    """Parse POST from JSON (fetch) or form fields (HTML fallback)."""
+    content_type = request.headers.get("Content-Type", "") or ""
+    if "application/json" in content_type:
+        raw = request.body
+        if raw:
+            if isinstance(raw, (bytes, bytearray, memoryview)):
+                raw = bytes(raw).decode("utf-8")
+            raw = raw.strip()
+            if raw:
+                try:
+                    return json.loads(raw)
+                except ValueError:
+                    pass
+
+    form = request.form_data
+    if form is not None:
+        press_enter = form.get("press_enter")
+        return {
+            "data": form.get("data", ""),
+            "press_enter": press_enter in ("on", "true", True, "1"),
+            "special_1": form.get("special_1", "none"),
+            "special_2": form.get("special_2", "none"),
+            "shortcut_char": form.get("shortcut_char", ""),
+        }
+
+    return {}
+
+
 @server.route("/", [GET, POST])
 def form(request: Request):
     """
     Serve a form with the given enctype, and display back the submitted value.
     """
-    enctype = "text/plain"
-
     if request.method == POST:
-        body = json.loads(request.body)
+        body = _parse_submission(request)
         data = body.get("data", "")
         key1 = body.get("special_1", "none")
         key2 = body.get("special_2", "none")
@@ -454,10 +523,10 @@ def form(request: Request):
             print("Decoded:")
             print(data)
 
-            if enter:
-                data += "\n"
-
-            layout.write(data)
+            if data or enter:
+                if enter:
+                    data += "\n"
+                layout.write(data)
 
         else:
             # Shortcut mode
@@ -475,7 +544,11 @@ def form(request: Request):
             print(f"Sending {keycodes}")
             kbd.send(*keycodes)
 
-        return Response(request, '{"ok":true}', content_type="application/json")
+        content_type = request.headers.get("Content-Type", "") or ""
+        if "application/json" in content_type:
+            return Response(request, '{"ok":true}', content_type="application/json")
+
+        return Response(request, FORM_HTML_TEMPLATE, content_type="text/html")
 
     return Response(
         request,
