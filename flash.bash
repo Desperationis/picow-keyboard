@@ -17,6 +17,10 @@ then
 fi
 
 sudo rm /media/adhoc/CIRCUITPY/code.py
+sudo rm -rf /media/adhoc/CIRCUITPY/lib/usb_keyboard
+sudo mkdir -p /media/adhoc/CIRCUITPY/lib
+sudo cp -r lib/usb_keyboard /media/adhoc/CIRCUITPY/lib/
 sudo cp code.py /media/adhoc/CIRCUITPY/
+sudo cp boot.py /media/adhoc/CIRCUITPY/
 echo "Flashed to Pico."
 

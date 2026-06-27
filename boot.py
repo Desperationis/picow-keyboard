@@ -7,6 +7,10 @@ from board import *
 import board
 import digitalio
 import storage
+import usb_hid
+
+# Keyboard only: frees USB endpoints on Pico W (mouse/consumer control not needed).
+usb_hid.enable((usb_hid.Device.KEYBOARD,))
 
 noStorage = False
 noStoragePin = digitalio.DigitalInOut(GP15)
